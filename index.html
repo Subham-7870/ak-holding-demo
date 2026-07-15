@@ -1,320 +1,2767 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>L'Atelier Français - Website Portal Gateway</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-      :root {
-        --primary-color: #0b1c3a;
-        --accent-color: #ed2939;
-        --bg-light: #f4f5f7;
-        --text-main: #1f2937;
-        --text-muted: #5e6675;
-        --border-color: rgba(11, 28, 58, 0.08);
-        --glass-bg: rgba(255, 255, 255, 0.75);
-        --glass-border: rgba(255, 255, 255, 0.45);
-        --glass-shadow: 0 8px 32px 0 rgba(11, 28, 58, 0.04);
-        --font-title: 'Playfair Display', serif;
-        --font-body: 'Poppins', sans-serif;
-      }
-
-      /* System Dark Mode Preference support */
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --bg-light: #0d162a;
-          --text-main: #f3f4f6;
-          --text-muted: #9ca3af;
-          --border-color: rgba(36, 52, 92, 0.4);
-          --glass-bg: rgba(22, 34, 63, 0.75);
-          --glass-border: rgba(36, 52, 92, 0.45);
-          --glass-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.25);
-          --primary-color: #ffffff;
-        }
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: var(--font-body);
-        background-color: var(--bg-light);
-        color: var(--text-main);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        position: relative;
-        overflow-x: hidden;
-        /* Subtle layout grid lines background */
-        background-image: 
-          linear-gradient(rgba(11, 28, 58, 0.018) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(11, 28, 58, 0.018) 1px, transparent 1px);
-        background-size: 50px 50px;
-        background-position: center top;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        body {
-          background-image: 
-            linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-        }
-        body::before {
-          content: "";
-          position: fixed;
-          inset: 0;
-          opacity: 0.014;
-          z-index: 9999;
-          pointer-events: none;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-      }
-
-      /* Glowing spotlights overlay (Navy & Crimson Red) */
-      body::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        pointer-events: none;
-        background-image: 
-          radial-gradient(circle at 80% 20%, rgba(237, 41, 57, 0.08), transparent 50%),
-          radial-gradient(circle at 20% 50%, rgba(0, 35, 149, 0.095), transparent 55%),
-          radial-gradient(circle at 75% 80%, rgba(237, 41, 57, 0.05), transparent 45%);
-      }
-
-      @media (prefers-color-scheme: dark) {
-        body::after {
-          background-image: 
-            radial-gradient(circle at 80% 15%, rgba(237, 41, 57, 0.22), transparent 55%),
-            radial-gradient(circle at 20% 45%, rgba(0, 35, 149, 0.26), transparent 60%),
-            radial-gradient(circle at 75% 75%, rgba(237, 41, 57, 0.15), transparent 50%);
-        }
-      }
-
-      .portal-container {
-        max-width: 800px;
-        width: 100%;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        box-shadow: var(--glass-shadow);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-radius: 24px;
-        padding: 40px;
-        text-align: center;
-        z-index: 10;
-      }
-
-      .logo-icon {
-        font-size: 3rem;
-        color: var(--accent-color);
-        margin-bottom: 15px;
-      }
-
-      .portal-title {
-        font-family: var(--font-title);
-        font-size: 2.5rem;
-        color: var(--primary-color);
-        margin-bottom: 8px;
-      }
-
-      .portal-subtitle {
-        color: var(--text-muted);
-        font-size: 1.05rem;
-        max-width: 600px;
-        margin: 0 auto 30px;
-      }
-
-      .versions-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px;
-        margin-bottom: 30px;
-      }
-
-      @media (max-width: 640px) {
-        .versions-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .version-card {
-        background: rgba(255, 255, 255, 0.4);
-        border: 1px solid var(--border-color);
-        border-radius: 16px;
-        padding: 30px 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        .version-card {
-          background: rgba(22, 34, 63, 0.35);
-        }
-      }
-
-      .version-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 24px rgba(11, 28, 58, 0.08);
-        border-color: rgba(237, 41, 57, 0.25);
-      }
-
-      .version-badge {
-        background: var(--accent-color);
-        color: #ffffff;
-        padding: 4px 12px;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        margin-bottom: 15px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .version-badge.v1 {
-        background: var(--text-muted);
-      }
-
-      .version-card h3 {
-        font-family: var(--font-title);
-        font-size: 1.5rem;
-        margin-bottom: 10px;
-        color: var(--primary-color);
-      }
-
-      .version-card p {
-        font-size: 0.9rem;
-        color: var(--text-muted);
-        margin-bottom: 20px;
-        line-height: 1.5;
-        flex: 1;
-      }
-
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 48px;
-        padding: 0 24px;
-        border-radius: 9999px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        width: 100%;
-      }
-
-      .btn-red {
-        background: var(--accent-color);
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(237, 41, 57, 0.2);
-      }
-
-      .btn-red:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(237, 41, 57, 0.3);
-      }
-
-      .btn-outline {
-        border: 2px solid var(--text-main);
-        color: var(--text-main);
-      }
-
-      .btn-outline:hover {
-        background: var(--text-main);
-        color: var(--bg-light);
-        transform: translateY(-2px);
-      }
-
-      .redirect-banner {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      }
-
-      .redirect-banner i {
-        color: var(--accent-color);
-      }
-
-      .footer-credit {
-        margin-top: 40px;
-        font-size: 0.8rem;
-        opacity: 0.7;
-      }
-
-      .footer-credit a {
-        color: inherit;
-        text-decoration: underline;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="portal-container">
-      <i class="fa-solid fa-feather-pointed logo-icon"></i>
-      <h1 class="portal-title">L'Atelier Français</h1>
-      <p class="portal-subtitle">Welcome to Monsieur Pierre's French Learning Portfolio. Select the version you would like to explore.</p>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Import Premium Fonts: Plus Jakarta Sans for Headers & UI, Inter for body reading -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" />
+  
+  <title>AK Prime Holdings — Capital Growth &amp; Advisory Systems</title>
+  <meta name="description" content="AK Prime Holdings coordinates strategic capital guidance and custom web application solutions." />
+  
+  <style>
+    :root {
+      /* ELITE DARK OBSIDIAN DESIGN SYSTEM */
+      --bg-primary: #050507;    /* Ink Obsidian Black */
+      --bg-offset: #09090c;     /* Dark Charcoal Offset */
+      --bg-card: rgba(14, 14, 20, 0.45);
+      --border: rgba(255, 255, 255, 0.05); /* Ultra-fine border line */
+      --border-glow: rgba(59, 130, 246, 0.15);
       
-      <div class="versions-grid">
-        <!-- Version 2 -->
-        <div class="version-card">
-          <span class="version-badge">Version 2</span>
-          <h3>React Rebuild</h3>
-          <p>Modern React + Vite setup. Clean glassmorphism styling, saturated ambient light spotlights, active word tickers, and translation-synced audio guide tracks.</p>
-          <a href="v2/" class="btn btn-red">Explore V2 (React)</a>
+      --text-primary: #f8fafc;   /* Slate white */
+      --text-secondary: #94a3b8; /* Cool slate grey */
+      --text-muted: #64748b;     /* Slate grey muted */
+      
+      --accent: #3b82f6;       /* Neon sky blue */
+      --accent-purple: #8b5cf6; /* Royal violet */
+      --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+      
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-sans: 'Inter', sans-serif;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.8);
+      --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.6);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.8);
+      --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtly Textured Background Grid (Very subtle line styling: 0.008 opacity) */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.008) 1px, transparent 1px);
+      background-size: 60px 60px;
+      background-position: center top;
+      pointer-events: none;
+    }
+
+    /* Vignette gradient mask to make grid fade out at screen edges */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background: radial-gradient(circle at 50% 50%, transparent 20%, var(--bg-primary) 85%);
+      pointer-events: none;
+    }
+
+    /* Interactive spotlight mouse tracking glow (Very subtle highlight) */
+    #mouse-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.03) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+      transform: translate(-50%, -50%);
+      will-change: transform;
+      mix-blend-mode: screen;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    /* Scrollbar Style */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    .font-display {
+      font-family: var(--font-display);
+    }
+
+    /* Floating Island Nav Header */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 4rem;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: var(--transition-smooth);
+      background: rgba(5, 5, 7, 0.75);
+      transform: translate3d(0, 0, 0);
+    }
+
+    nav.scrolled {
+      height: 60px;
+      border-bottom-color: rgba(255, 255, 255, 0.08);
+      background: rgba(5, 5, 7, 0.9);
+      box-shadow: var(--shadow-md);
+    }
+
+    .brand-logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-symbol {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: #ffffff;
+      text-decoration: none;
+      letter-spacing: -0.03em;
+    }
+
+    .nav-desktop {
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      padding: 6px 0;
+      position: relative;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #ffffff;
+    }
+
+    /* Elegant thin active marker line */
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-gradient);
+      transition: var(--transition-smooth);
+    }
+
+    .nav-link.active::after {
+      width: 100%;
+    }
+
+    kbd {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #64748b;
+      border-radius: 4px;
+      padding: 1px 5px;
+      margin-left: 6px;
+      font-weight: 700;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.4);
+    }
+
+    /* Mobile Hamburger Menu */
+    .nav-mobile-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-primary);
+      padding: 8px;
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 110;
+    }
+
+    .nav-mobile-btn span {
+      width: 22px;
+      height: 2px;
+      background: currentColor;
+      display: block;
+      transition: var(--transition-smooth);
+    }
+
+    .nav-mobile-btn.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .nav-mobile-btn.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .nav-mobile-btn.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    @media (max-width: 820px) {
+      .nav-desktop {
+        display: none;
+      }
+      .nav-mobile-btn {
+        display: flex;
+      }
+      nav {
+        padding: 0 1.5rem;
+      }
+    }
+
+    /* Mobile Menu Overlay */
+    .mobile-menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      z-index: 99;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2.2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition-smooth);
+    }
+
+    .mobile-menu-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-menu-overlay .nav-link {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #ffffff !important;
+    }
+
+    /* Organic Liquid Aurora Orbs - VERY SUBTLE (0.07 opacity) */
+    .background-orb {
+      position: fixed;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: -2;
+      opacity: 0.07;
+      mix-blend-mode: screen;
+      transform: translate3d(0,0,0);
+      backface-visibility: hidden;
+      will-change: transform;
+    }
+
+    .orb-blue {
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, #3b82f6 0%, transparent 80%);
+      top: -15%;
+      left: -15%;
+      animation: liquidOrbit1 20s infinite ease-in-out;
+    }
+
+    .orb-purple {
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, #8b5cf6 0%, transparent 80%);
+      bottom: -15%;
+      right: -15%;
+      animation: liquidOrbit2 24s infinite ease-in-out;
+    }
+
+    @keyframes liquidOrbit1 {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+        border-radius: 50% 50% 50% 50%;
+      }
+      33% {
+        transform: translate3d(120px, 80px, 0) scale(1.1) rotate(120deg);
+        border-radius: 42% 58% 47% 53%;
+      }
+      66% {
+        transform: translate3d(-60px, 160px, 0) scale(0.9) rotate(240deg);
+        border-radius: 58% 42% 53% 47%;
+      }
+      100% {
+        transform: translate3d(0, 0, 0) scale(1) rotate(360deg);
+        border-radius: 50% 50% 50% 50%;
+      }
+    }
+
+    @keyframes liquidOrbit2 {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+        border-radius: 50% 50% 50% 50%;
+      }
+      33% {
+        transform: translate3d(-140px, 140px, 0) scale(0.85) rotate(-120deg);
+        border-radius: 55% 45% 42% 58%;
+      }
+      66% {
+        transform: translate3d(90px, -70px, 0) scale(1.1) rotate(-240deg);
+        border-radius: 45% 55% 58% 42%;
+      }
+      100% {
+        transform: translate3d(0, 0, 0) scale(1) rotate(-360deg);
+        border-radius: 50% 50% 50% 50%;
+      }
+    }
+
+    /* Hero Section */
+    .hero-section {
+      min-height: 100vh;
+      padding: 160px 4rem 100px;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 5rem;
+      align-items: center;
+      max-width: 1300px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .hero-content {
+      text-align: left;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-eyebrow-line {
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 5vw, 4.4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      color: var(--text-primary);
+      margin-bottom: 1.8rem;
+    }
+
+    .gradient-text {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 40px rgba(99, 102, 241, 0.15);
+    }
+
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin-bottom: 3.5rem;
+      font-weight: 400;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    /* Right Column: Compounding Capital Growth Visualizer Card */
+    .growth-visualizer-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      width: 100%;
+    }
+
+    .growth-chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.2rem;
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+      transform: translate3d(0,0,0);
+    }
+
+    .growth-chart-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent);
+    }
+
+    .growth-chart-card:hover {
+      transform: translate3d(0, -5px, 0);
+      border-color: rgba(59, 130, 246, 0.3);
+      box-shadow: 0 25px 50px rgba(59, 130, 246, 0.08), 0 0 0 1px rgba(59, 130, 246, 0.12);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .chart-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .chart-value {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .growth-chart-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Animated Drawing Curve with drop shadow glow */
+    .growth-chart-path {
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      animation: drawCurveLine 8.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      filter: drop-shadow(0 4px 10px rgba(59, 130, 246, 0.35));
+    }
+
+    @keyframes drawCurveLine {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Glowing radar pings centered on coordinates */
+    .chart-dot-core {
+      fill: var(--accent);
+    }
+
+    .chart-dot-ring {
+      fill: var(--accent);
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: radarPing 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    }
+
+    @keyframes radarPing {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.85;
+      }
+      100% {
+        transform: scale(2.5);
+        opacity: 0;
+      }
+    }
+
+    .chart-timeline {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-family: var(--font-display);
+      color: var(--text-secondary);
+      margin-top: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Sub stats grid */
+    .mini-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    .mini-stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.3rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition-smooth);
+      transform: translate3d(0,0,0);
+    }
+
+    .mini-stat-card:hover {
+      border-color: rgba(59, 130, 246, 0.2);
+      transform: translate3d(0, -2px, 0);
+    }
+
+    .mini-stat-title {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .mini-stat-value {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 1024px) {
+      .hero-section {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+        padding-top: 130px;
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+
+    /* Buttons with Premium Shimmer Effects */
+    .btn {
+      padding: 1rem 2.4rem;
+      border-radius: 12px;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transform: translate3d(0,0,0);
+    }
+
+    .btn-primary {
+      background: var(--accent-gradient);
+      background-size: 200% 200%;
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.25);
+      animation: shiftButtonGradient 8s ease infinite;
+    }
+
+    .btn-primary:hover {
+      transform: translate3d(0, -3px, 0);
+      box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+      filter: brightness(1.08);
+    }
+
+    .btn-primary svg {
+      transition: transform 200ms ease;
+    }
+
+    .btn-primary:hover svg {
+      transform: translateX(4px);
+    }
+
+    .btn-secondary {
+      background: #0f172a;
+      color: var(--text-primary);
+      border-color: #334155;
+    }
+
+    .btn-secondary:hover {
+      background: #1e293b;
+      transform: translate3d(0, -3px, 0);
+      border-color: #475569;
+    }
+
+    /* Sections styling */
+    section {
+      padding: 10rem 4rem;
+      position: relative;
+    }
+
+    .section-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header-v2 {
+      margin-bottom: 6rem;
+      text-align: left;
+    }
+
+    .section-num {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.8rem;
+      letter-spacing: 0.08em;
+    }
+
+    .section-title-v2 {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+    }
+
+    .section-desc-v2 {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin-top: 0.8rem;
+      font-weight: 400;
+    }
+
+    /* Grow More Capital Grid (01) */
+    .capital-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 1024px) {
+      .capital-grid {
+        grid-template-columns: 1fr;
+        gap: 3.5rem;
+      }
+    }
+
+    /* Glassmorphic Morningstar Widget */
+    .widget-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.2rem;
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: var(--transition-smooth);
+      transform: translate3d(0,0,0);
+    }
+
+    .widget-container:hover {
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(59, 130, 246, 0.2);
+    }
+
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.2rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .widget-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .widget-tabs {
+      display: flex;
+      background: var(--bg-offset);
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    .widget-tab {
+      background: none;
+      border: none;
+      padding: 6px 14px;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .widget-tab.active {
+      background: var(--bg-primary);
+      color: var(--accent);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .widget-pane {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .widget-pane.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Barometer cells */
+    .baro-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 8px;
+    }
+
+    .baro-cell {
+      height: 48px;
+      border-radius: 8px;
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      transition: var(--transition-smooth);
+      cursor: default;
+    }
+
+    .baro-cell:hover {
+      transform: scale(1.05);
+      filter: brightness(1.08);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .cell-up { background: #10b981; }
+    .cell-down { background: #f43f5e; }
+    .cell-mid { background: #64748b; }
+
+    .baro-label-row {
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      text-align: left;
+      padding-left: 8px;
+      font-weight: 600;
+    }
+
+    .baro-label-col {
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      text-align: center;
+      padding-top: 8px;
+      font-weight: 600;
+    }
+
+    /* Movers Row */
+    .mover-list-v2 {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .mover-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem 1.2rem;
+      background: var(--bg-offset);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      transition: var(--transition-smooth);
+      transform: translate3d(0,0,0);
+    }
+
+    .mover-row:hover {
+      border-color: var(--accent);
+      background: var(--bg-card);
+      transform: translate3d(4px, 0, 0);
+    }
+
+    .mover-row:hover .mover-spark path {
+      filter: drop-shadow(0 0 6px currentColor);
+      stroke-width: 2.5px;
+    }
+
+    /* Realtime update highlights */
+    .price-flash-up {
+      animation: flashGreen 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .price-flash-down {
+      animation: flashRed 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes flashGreen {
+      0% { color: #10b981; transform: scale(1.08); }
+      100% { color: #10b981; transform: scale(1); }
+    }
+
+    @keyframes flashRed {
+      0% { color: #f43f5e; transform: scale(1.08); }
+      100% { color: #f43f5e; transform: scale(1); }
+    }
+
+    .mover-name {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      width: 90px;
+      text-align: left;
+    }
+
+    .mover-spark {
+      width: 120px;
+      height: 34px;
+      overflow: visible;
+    }
+
+    .mover-percent {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      width: 70px;
+      text-align: right;
+      transition: color 0.3s ease;
+    }
+
+    .percent-up { color: #10b981; }
+    .percent-down { color: #f43f5e; }
+
+    /* Goldman Sachs Stats Row */
+    .stats-horizontal {
+      display: flex;
+      gap: 2rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 2.2rem 0;
+      margin: 3rem 0;
+      flex-wrap: wrap;
+    }
+
+    .stat-block {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .stat-val {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      font-weight: 700;
+    }
+
+    /* BlackRock Commentary Card */
+    .commentary-wrap {
+      border-left: 3px solid var(--accent);
+      padding-left: 1.5rem;
+      margin: 2.5rem 0;
+    }
+
+    .commentary-eyebrow {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .commentary-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .commentary-body {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Bullet point cards */
+    .bullet-container-v2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .bullet-card-v2 {
+      background: var(--bg-offset);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: var(--transition-smooth);
+      transform: translate3d(0,0,0);
+    }
+
+    .bullet-card-v2:hover {
+      border-color: var(--accent);
+      background: var(--bg-card);
+      transform: translate3d(0, -2px, 0);
+    }
+
+    .bullet-lbl-v2 {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Prime Web Studio Layout (02) */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    @media (max-width: 1024px) {
+      .studio-grid {
+        grid-template-columns: 1fr;
+        gap: 3.5rem;
+      }
+    }
+
+    /* Custom visual laptop editor mockup (IDE look with Line Numbers) */
+    .code-editor-mockup {
+      background: #0d0f14;
+      border: 1px solid #232936;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      width: 100%;
+      text-align: left;
+      transition: var(--transition-smooth);
+      transform: translate3d(0,0,0);
+    }
+
+    .code-editor-mockup:hover {
+      border-color: var(--accent-light);
+      box-shadow: 0 25px 50px rgba(99, 102, 241, 0.12);
+      transform: translate3d(0, -4px, 0);
+    }
+
+    .editor-titlebar {
+      background: #141822;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #232936;
+    }
+
+    .editor-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .editor-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .editor-title {
+      color: #64748b;
+      font-size: 0.75rem;
+      font-family: monospace;
+      font-weight: 600;
+    }
+
+    .editor-body-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      font-family: monospace;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      background: #0d0f14;
+    }
+
+    .editor-line-numbers {
+      padding: 1.5rem 0.75rem 1.5rem 1.25rem;
+      color: #334155;
+      text-align: right;
+      user-select: none;
+      border-right: 1px solid #232936;
+      background: #090b0f;
+    }
+
+    .editor-code-container {
+      padding: 1.5rem;
+      overflow-x: auto;
+      white-space: pre;
+      color: #94a3b8;
+    }
+
+    .code-keyword { color: #f472b6; }
+    .code-class { color: #38bdf8; }
+    .code-string { color: #34d399; }
+    .code-comment { color: #475569; font-style: italic; }
+
+    /* Typing active cursor blink */
+    .editor-cursor {
+      color: var(--accent);
+      animation: blinkCursor 1s step-end infinite;
+      font-weight: 700;
+    }
+
+    @keyframes blinkCursor {
+      from, to { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Services Grid (Clean SVG Icons & Border Highlight) */
+    .service-grid-v2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .service-item-v2 {
+      padding: 1.8rem;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: var(--transition-smooth);
+      transform: translate3d(0,0,0);
+      text-align: left;
+    }
+
+    .service-item-v2:hover {
+      border-color: rgba(59, 130, 246, 0.3);
+      transform: translate3d(0, -4px, 0);
+      box-shadow: 0 15px 30px var(--accent-glow);
+    }
+
+    .service-icon-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: var(--transition-smooth);
+    }
+
+    .service-item-v2:hover .service-icon-circle {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px currentColor;
+    }
+
+    .service-icon-blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .service-icon-purple { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+    .service-icon-orange { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+    .service-icon-green { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+    .service-title-v2 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .service-body-v2 {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Testimonials Section (03) */
+    .reviews-section {
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border);
+      transition: background-color 0.4s ease;
+    }
+
+    .reviews-grid-v2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .review-card-v2 {
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 2.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: var(--transition-smooth);
+      transform: translate3d(0,0,0);
+    }
+
+    .review-card-v2:hover {
+      border-color: var(--accent);
+      transform: translate3d(0, -4px, 0);
+      box-shadow: var(--shadow-md);
+    }
+
+    .review-stars-v2 {
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .review-text-v2 {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .client-block-v2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .client-avatar-v2 {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-offset);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .client-name-v2 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .client-loc-v2 {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Briefings Box */
+    .briefings-wrap-v2 {
+      background: var(--bg-offset);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3.5rem;
+      margin-top: 6rem;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      transition: var(--transition-smooth);
+      transform: translate3d(0,0,0);
+    }
+
+    .briefings-wrap-v2:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md);
+    }
+
+    .briefings-title-v2 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.6rem;
+    }
+
+    .briefings-desc-v2 {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .briefings-form-v2 {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    @media (max-width: 768px) {
+      .briefings-wrap-v2 {
+        grid-template-columns: 1fr;
+        gap: 1.8rem;
+        padding: 2.2rem;
+      }
+      .briefings-form-v2 {
+        flex-direction: column;
+      }
+    }
+
+    /* Contact Section */
+    .contact-section-v2 {
+      background: var(--bg-offset);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      transition: background-color 0.4s ease;
+    }
+
+    .contact-split-v2 {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 4.5rem;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    @media (max-width: 900px) {
+      .contact-split-v2 {
+        grid-template-columns: 1fr;
+        gap: 3.5rem;
+      }
+    }
+
+    .badge-availability {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      border-radius: 50px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      font-family: var(--font-display);
+      letter-spacing: 0.02em;
+    }
+
+    .dot-pulse {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.5; }
+    }
+
+    .channel-row-v2 {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1.2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-decoration: none;
+      transition: var(--transition-smooth);
+      margin-bottom: 1rem;
+      transform: translate3d(0,0,0);
+    }
+
+    .channel-row-v2:hover {
+      border-color: var(--accent);
+      transform: translate3d(4px, 0, 0);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Channel icon tactile feedback */
+    .channel-icon-v2 {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--bg-offset);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      border: 1px solid var(--border);
+      transition: var(--transition-smooth);
+    }
+
+    .channel-row-v2:hover .channel-icon-v2 {
+      transform: scale(1.15) rotate(-6deg);
+      border-color: var(--accent);
+      background: var(--bg-primary);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .channel-lbl-v2 {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+
+    .channel-val-v2 {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .location-marker-card-v2 {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 1.2rem;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      margin-top: 2rem;
+    }
+
+    .location-info-wrapper {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .location-title-v2 {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .location-body-v2 {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Embedded contact panel */
+    .contact-form-panel-v2 {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transform: translate3d(0,0,0);
+    }
+
+    .form-selector-tabs-v2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--bg-offset);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+    }
+
+    .selector-tab-v2 {
+      background: none;
+      border: none;
+      padding: 10px;
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .selector-tab-v2.active {
+      background: var(--bg-primary);
+      color: var(--accent);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--bg-primary);
+      padding: 6.5rem 4rem 3.5rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border);
+      transition: background-color 0.4s ease;
+    }
+
+    .footer-grid-v2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto 3.5rem;
+      padding-bottom: 3.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .footer-brand-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.6rem;
+    }
+
+    .footer-brand-desc {
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      max-width: 255px;
+      line-height: 1.6;
+    }
+
+    .footer-column-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 1.4rem;
+    }
+
+    .footer-column-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .footer-action-btn {
+      background: none;
+      border: none;
+      text-align: left;
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .footer-action-btn:hover {
+      color: var(--accent);
+    }
+
+    .footer-meta-link {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .footer-meta-link:hover {
+      color: var(--accent);
+    }
+
+    .footer-bottom-v2 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .copyright-lbl {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-region-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .region-badge-dot {
+      width: 4px;
+      height: 4px;
+      background: var(--text-secondary);
+      border-radius: 50%;
+    }
+
+    .region-badge-text {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    /* Entrance reveal animations */
+    .reveal-v2 {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-v2.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Form group styling */
+    .form-group-v2 {
+      margin-bottom: 1.25rem;
+      text-align: left;
+    }
+
+    .form-label-v2 {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-input-v2 {
+      width: 100%;
+      padding: 0.85rem 1.1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-offset);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      transition: var(--transition-smooth);
+    }
+
+    .form-input-v2:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      background: var(--bg-primary);
+    }
+
+    textarea.form-input-v2 {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* Toast style */
+    .toast-v2 {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      color: var(--text-primary);
+      padding: 0.9rem 1.6rem;
+      border-radius: 8px;
+      z-index: 1000;
+      transform: translateY(120%) scale(0.95);
+      opacity: 0;
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.88rem;
+      pointer-events: none;
+    }
+
+    .toast-v2.show {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Responsive adjustments for mobile viewports (< 768px) */
+    @media (max-width: 768px) {
+      nav {
+        padding: 0 1.25rem;
+      }
+      .brand-logo {
+        font-size: 1.05rem;
+      }
+      
+      section {
+        padding: 4.5rem 1.25rem;
+      }
+      
+      .hero-section {
+        padding: 110px 1.25rem 4.5rem;
+        gap: 3rem;
+      }
+      
+      .hero-title {
+        font-size: clamp(2rem, 8vw, 2.8rem);
+      }
+      
+      .hero-desc {
+        font-size: 1rem;
+        margin-bottom: 2.2rem;
+      }
+      
+      .hero-ctas {
+        gap: 0.8rem;
+        width: 100%;
+      }
+      
+      .btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.85rem;
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .growth-chart-card {
+        padding: 1.25rem;
+      }
+      
+      .chart-title {
+        font-size: 0.95rem;
+      }
+      
+      .chart-value {
+        font-size: 1.2rem;
+      }
+      
+      .mini-stat-card {
+        padding: 1rem;
+      }
+      
+      .mini-stat-value {
+        font-size: 1.15rem;
+      }
+      
+      .section-header-v2 {
+        margin-bottom: 3rem;
+      }
+      
+      .section-title-v2 {
+        font-size: 1.8rem;
+      }
+      
+      .capital-grid, .studio-grid, .contact-split-v2 {
+        gap: 2.5rem;
+      }
+      
+      .widget-container {
+        padding: 1.25rem;
+      }
+      
+      .baro-cell {
+        height: 40px;
+        font-size: 0.75rem;
+      }
+      
+      .baro-table {
+        border-spacing: 4px;
+      }
+      
+      .bullet-container-v2 {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-horizontal {
+        gap: 1.5rem;
+        padding: 1.5rem 0;
+      }
+      
+      .stat-block {
+        min-width: 110px;
+      }
+      
+      .stat-val {
+        font-size: 1.8rem;
+      }
+      
+      .editor-body-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .editor-line-numbers {
+        display: none;
+      }
+      
+      .code-editor-mockup .editor-code-container {
+        padding: 1.25rem;
+        font-size: 0.78rem;
+      }
+      
+      .service-grid-v2 {
+        grid-template-columns: 1fr;
+      }
+      
+      .review-card-v2 {
+        padding: 1.5rem;
+      }
+      
+      .briefings-wrap-v2 {
+        padding: 1.5rem;
+        margin-top: 3.5rem;
+        gap: 1.5rem;
+      }
+      
+      .briefings-title-v2 {
+        font-size: 1.35rem;
+      }
+      
+      .contact-form-panel-v2 {
+        padding: 1.25rem;
+      }
+      
+      footer {
+        padding: 4rem 1.25rem 2.5rem;
+      }
+      
+      .footer-grid-v2 {
+        gap: 2rem;
+        margin-bottom: 2.5rem;
+        padding-bottom: 2.5rem;
+      }
+      
+      .footer-bottom-v2 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating indicator for scroll height (Scroll progress bar) -->
+  <div id="scroll-progress" style="position: fixed; top: 0; left: 0; height: 2px; background: var(--accent-gradient); width: 0%; z-index: 101; transition: width 0.1s ease-out;"></div>
+
+  <!-- Glowing background elements (Fixed & shape morphing lava lamp orbs - VERY SUBTLE) -->
+  <div class="background-orb orb-blue"></div>
+  <div class="background-orb orb-purple"></div>
+
+  <!-- Header Navigation -->
+  <nav id="navbar-v2">
+    <div class="brand-logo-container">
+      <div class="brand-symbol">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M4 18L10 12L14 16L20 8" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="20" cy="8" r="2.5" fill="#8b5cf6"/>
+          <defs>
+            <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#3b82f6" />
+              <stop offset="100%" stop-color="#8b5cf6" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <a href="#" class="brand-logo">AK Prime Holdings</a>
+    </div>
+    <div class="nav-desktop">
+      <a href="#grow-more-capital" class="nav-link">
+        <span>Capital</span>
+        <kbd>⌥1</kbd>
+      </a>
+      <a href="#prime-web-studio" class="nav-link">
+        <span>Studio</span>
+        <kbd>⌥2</kbd>
+      </a>
+      <a href="#reviews" class="nav-link">
+        <span>Insights</span>
+        <kbd>⌥3</kbd>
+      </a>
+      <a href="#contact" class="nav-link">
+        <span>Contact</span>
+        <kbd>⌥4</kbd>
+      </a>
+    </div>
+    <button class="nav-mobile-btn" aria-label="Toggle Navigation" id="mobile-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Overlay Menu -->
+  <div class="mobile-menu-overlay" id="mobile-menu">
+    <a href="#grow-more-capital" class="nav-link">Grow More Capital</a>
+    <a href="#prime-web-studio" class="nav-link">Prime Web Studio</a>
+    <a href="#reviews" class="nav-link">Client Reviews</a>
+    <a href="#contact" class="nav-link">Contact</a>
+  </div>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section" id="hero">
+      <div class="hero-content">
+        <span class="hero-eyebrow">
+          <span class="hero-eyebrow-line"></span>
+          <span>Strategic Wealth Coordination</span>
+        </span>
+        <h1 class="font-display hero-title">Architecting <span class="gradient-text">Wealth</span>.<br>Empowering <span class="gradient-text">Growth</span>.</h1>
+        <p class="hero-desc">AK Prime Holdings coordinates strategic wealth management guidance to compound your capital assets, backed by bespoke website engineering capabilities.</p>
+        <div class="hero-ctas">
+          <a href="#grow-more-capital" class="btn btn-primary">
+            <span>Explore Capital</span>
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 10 10">
+              <path d="M1 5h7M5 2l3 3-3 3"></path>
+            </svg>
+          </a>
+          <a href="#prime-web-studio" class="btn btn-secondary">Digital Studio</a>
+        </div>
+      </div>
+      
+      <!-- Right Column: Compounding Capital Growth Visualizer -->
+      <div class="growth-visualizer-container">
+        <div class="growth-chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Compounding Advisory Growth</div>
+              <div class="chart-subtitle">Advisory trajectory based on target 12% CAGR</div>
+            </div>
+            <div class="chart-value" id="hero-wealth-counter">₹2,40,15,389.20</div>
+          </div>
+          
+          <div class="chart-body">
+            <svg class="growth-chart-svg" viewBox="0 0 300 120">
+              <line x1="0" y1="20" x2="300" y2="20" stroke="var(--border)" stroke-dasharray="4,4"></line>
+              <line x1="0" y1="60" x2="300" y2="60" stroke="var(--border)" stroke-dasharray="4,4"></line>
+              <line x1="0" y1="100" x2="300" y2="100" stroke="var(--border)" stroke-dasharray="4,4"></line>
+              
+              <defs>
+                <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.2"></stop>
+                  <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.0"></stop>
+                </linearGradient>
+              </defs>
+              <path class="growth-chart-path" d="M0,105 Q60,98 120,84 T220,44 T300,10 L300,120 L0,120 Z" fill="url(#chart-grad)"></path>
+              <path class="growth-chart-path" d="M0,105 Q60,98 120,84 T220,44 T300,10" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"></path>
+              
+              <!-- Compounding coordinate flow tracer -->
+              <circle r="4" fill="#3b82f6" style="filter: drop-shadow(0 0 4px #3b82f6);">
+                <animateMotion dur="8.5s" repeatCount="indefinite" path="M0,105 Q60,98 120,84 T220,44 T300,10" />
+              </circle>
+
+              <!-- Core dot & radar ping ring 1 -->
+              <circle class="chart-dot-ring" cx="120" cy="84" r="4.5"></circle>
+              <circle class="chart-dot-core" cx="120" cy="84" r="4.5"></circle>
+              
+              <!-- Core dot & radar ping ring 2 -->
+              <circle class="chart-dot-ring" cx="220" cy="44" r="4.5"></circle>
+              <circle class="chart-dot-core" cx="220" cy="44" r="4.5"></circle>
+              
+              <!-- Core dot & radar ping ring 3 -->
+              <circle class="chart-dot-ring" cx="300" cy="10" r="5"></circle>
+              <circle class="chart-dot-core" cx="300" cy="10" r="5"></circle>
+            </svg>
+            <div class="chart-timeline">
+              <span>Year 0</span>
+              <span>Year 5</span>
+              <span>Year 10</span>
+            </div>
+          </div>
         </div>
         
-        <!-- Version 1 -->
-        <div class="version-card">
-          <span class="version-badge v1">Version 1</span>
-          <h3>Original Site</h3>
-          <p>The original semantic HTML website layout containing responsive layouts, full map markers, and French test scoring modules.</p>
-          <a href="v1/" class="btn btn-outline">Explore V1 (Vanilla)</a>
+        <div class="mini-stats-grid">
+          <div class="mini-stat-card">
+            <div class="mini-stat-title">Target Advisory rate</div>
+            <div class="mini-stat-value" style="color: var(--accent);">12%+ CAGR</div>
+          </div>
+          <div class="mini-stat-card">
+            <div class="mini-stat-title">Advisement Volume</div>
+            <div class="mini-stat-value">₹10Cr+</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grow More Capital Section -->
+    <section id="grow-more-capital">
+      <div class="section-wrap">
+        <div class="reveal-v2 section-header-v2">
+          <span class="section-num">01 / CAPITAL</span>
+          <h2 class="font-display section-title-v2">Grow More Capital</h2>
+          <p class="section-desc-v2">Active financial market commentary, share market advisory structures, and capital positioning frameworks.</p>
+        </div>
+        
+        <div class="reveal-v2 capital-grid">
+          <div>
+            <p style="color:var(--text-secondary);font-size:1.05rem;line-height:1.7;margin-bottom:2rem;">
+              Our wealth Advisory division helps clients observe market growth patterns, analyze macroeconomic trends, and build structured portfolios with confidence.
+            </p>
+            
+            <div class="bullet-container-v2">
+              <div class="bullet-card-v2">
+                <span style="color: var(--accent); font-weight: bold;">01</span>
+                <span class="bullet-lbl-v2">Investment Ideas &amp; Options</span>
+              </div>
+              <div class="bullet-card-v2">
+                <span style="color: var(--accent); font-weight: bold;">02</span>
+                <span class="bullet-lbl-v2">Share Market Structures</span>
+              </div>
+              <div class="bullet-card-v2">
+                <span style="color: var(--accent); font-weight: bold;">03</span>
+                <span class="bullet-lbl-v2">Trend Analysis &amp; Forecasts</span>
+              </div>
+              <div class="bullet-card-v2">
+                <span style="color: var(--accent); font-weight: bold;">04</span>
+                <span class="bullet-lbl-v2">Financial Planning Modules</span>
+              </div>
+            </div>
+
+            <!-- Goldman Sachs Stats Horizontal Row -->
+            <div class="stats-horizontal">
+              <div class="stat-block">
+                <div class="stat-val">12%+</div>
+                <div class="stat-lbl">Target Return Rate</div>
+              </div>
+              <div class="stat-block">
+                <div class="stat-val">500+</div>
+                <div class="stat-lbl">Commentaries Published</div>
+              </div>
+              <div class="stat-block">
+                <div class="stat-val">₹10Cr+</div>
+                <div class="stat-lbl">Capital Under Advisement</div>
+              </div>
+            </div>
+
+            <!-- BlackRock Left-Border Commentary Block -->
+            <div class="commentary-wrap">
+              <div class="commentary-eyebrow">Market Outlook commentary</div>
+              <h4 class="commentary-title">2026 Global Capital Outlook: Inflation Trends vs. Asset Growth</h4>
+              <p class="commentary-body">Analyzing emerging trends in global markets, interest rate policies, and wealth preservation strategies for modern investors.</p>
+            </div>
+
+            <a href="#contact" class="btn btn-primary">Get Advisory Brief</a>
+          </div>
+
+          <!-- Morningstar Widget Panel -->
+          <div class="widget-container">
+            <div class="widget-header">
+              <div class="widget-title">Market Insight Center</div>
+              <div class="widget-tabs">
+                <!-- Movers is now the default tab button, Barometer is second -->
+                <button class="widget-tab active" id="tab-mover-btn" onclick="switchTab('mover')">Movers</button>
+                <button class="widget-tab" id="tab-baro-btn" onclick="switchTab('baro')">Barometer</button>
+              </div>
+            </div>
+
+            <!-- Movers Pane (Active by default) -->
+            <div class="widget-pane active" id="pane-mover">
+              <div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:1.1rem;text-transform:uppercase;letter-spacing:0.04em;">Active Growth Market Leaders</div>
+              <div class="mover-list-v2">
+                <!-- Reliance (Up) -->
+                <div class="mover-row" id="row-rel">
+                  <span class="mover-name">RELIANCE</span>
+                  <svg class="mover-spark" viewBox="0 0 100 30">
+                    <defs>
+                      <linearGradient id="spark-rel" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.25"/>
+                        <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <path id="fill-rel" d="M0,22 Q15,8 30,16 T60,5 T90,2 L100,2 L100,30 L0,30 Z" fill="url(#spark-rel)"></path>
+                    <path id="path-rel" d="M0,22 Q15,8 30,16 T60,5 T90,2 L100,2" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"></path>
+                  </svg>
+                  <span class="mover-percent percent-up" id="percent-rel">+2.45%</span>
+                </div>
+                
+                <!-- TCS (Down) -->
+                <div class="mover-row" id="row-tcs">
+                  <span class="mover-name">TCS</span>
+                  <svg class="mover-spark" viewBox="0 0 100 30">
+                    <defs>
+                      <linearGradient id="spark-tcs" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.25"/>
+                        <stop offset="100%" stop-color="#f43f5e" stop-opacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <path id="fill-tcs" d="M0,5 Q20,20 40,12 T70,25 L100,22 L100,30 L0,30 Z" fill="url(#spark-tcs)"></path>
+                    <path id="path-tcs" d="M0,5 Q20,20 40,12 T70,25 L100,22" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"></path>
+                  </svg>
+                  <span class="mover-percent percent-down" id="percent-tcs">-1.15%</span>
+                </div>
+                
+                <!-- Hdfc Bank (Up) -->
+                <div class="mover-row" id="row-hdfc">
+                  <span class="mover-name">HDFCBANK</span>
+                  <svg class="mover-spark" viewBox="0 0 100 30">
+                    <defs>
+                      <linearGradient id="spark-hdfc" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.25"/>
+                        <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <path id="fill-hdfc" d="M0,20 Q20,8 40,18 T70,5 L100,8 L100,30 L0,30 Z" fill="url(#spark-hdfc)"></path>
+                    <path id="path-hdfc" d="M0,20 Q20,8 40,18 T70,5 L100,8" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"></path>
+                  </svg>
+                  <span class="mover-percent percent-up" id="percent-hdfc">+1.92%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Barometer Pane (Inactive by default) -->
+            <div class="widget-pane" id="pane-baro">
+              <div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:1.1rem;text-transform:uppercase;letter-spacing:0.04em;">Returns Style Box (1D Metrics)</div>
+              <table class="baro-table">
+                <tbody>
+                  <tr>
+                    <td class="baro-cell cell-down">−1.12%</td>
+                    <td class="baro-cell cell-mid">+0.08%</td>
+                    <td class="baro-cell cell-up">+1.85%</td>
+                    <th scope="row" class="baro-label-row">Large</th>
+                  </tr>
+                  <tr>
+                    <td class="baro-cell cell-down">−0.45%</td>
+                    <td class="baro-cell cell-mid">0.00%</td>
+                    <td class="baro-cell cell-up">+0.82%</td>
+                    <th scope="row" class="baro-label-row">Mid</th>
+                  </tr>
+                  <tr>
+                    <td class="baro-cell cell-down">−0.08%</td>
+                    <td class="baro-cell cell-mid">+0.04%</td>
+                    <td class="baro-cell cell-up">+0.76%</td>
+                    <th scope="row" class="baro-label-row">Small</th>
+                  </tr>
+                  <tr>
+                    <td class="baro-label-col">Value</td>
+                    <td class="baro-label-col">Core</td>
+                    <td class="baro-label-col">Growth</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prime Web Studio Section -->
+    <section id="prime-web-studio">
+      <div class="section-wrap">
+        <div class="reveal-v2 section-header-v2">
+          <span class="section-num">02 / SYSTEMS</span>
+          <h2 class="font-display section-title-v2">Prime Web Studio</h2>
+          <p class="section-desc-v2">Custom software, modern responsive websites, and elegant layout engineering solutions.</p>
+        </div>
+        
+        <div class="reveal-v2 studio-grid">
+          <div>
+            <p style="color:var(--text-secondary);font-size:1.05rem;line-height:1.7;margin-bottom:2.2rem;">
+              We design and develop clean code architectures that adapt beautifully to all viewports. Our team ensures quick delivery cycles without compromising pixel precision.
+            </p>
+            
+            <div class="service-grid-v2">
+              <div class="service-item-v2">
+                <!-- SVG Code Icon -->
+                <div class="service-icon-circle service-icon-blue">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                  </svg>
+                </div>
+                <span class="service-title-v2">Web Engineering</span>
+                <p class="service-body-v2">Bespoke landing layouts and application frontends built with precision.</p>
+              </div>
+              <div class="service-item-v2">
+                <!-- SVG Pen Icon -->
+                <div class="service-icon-circle service-icon-purple">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122l9.82-9.82 2.122 2.122-9.82 9.82-2.122-2.122zm0 0L7 17l.878-2.53 1.652 1.652z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l3 3" />
+                  </svg>
+                </div>
+                <span class="service-title-v2">UI/UX Systems</span>
+                <p class="service-body-v2">Modular blueprints and modern interaction tokens for optimal interface rhythms.</p>
+              </div>
+              <div class="service-item-v2">
+                <!-- SVG Phone/Mobile Icon -->
+                <div class="service-icon-circle service-icon-orange">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3" />
+                  </svg>
+                </div>
+                <span class="service-title-v2">Responsive Code</span>
+                <p class="service-body-v2">Tailored structures adjusting seamlessly to mobile screens and tablet displays.</p>
+              </div>
+              <div class="service-item-v2">
+                <!-- SVG Lightning Icon -->
+                <div class="service-icon-circle service-icon-green">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                  </svg>
+                </div>
+                <span class="service-title-v2">Performant Pipelines</span>
+                <p class="service-body-v2">Optimized visual assets and fast response load times for Google lighthouse metrics.</p>
+              </div>
+            </div>
+            
+            <a href="#contact" class="btn btn-primary">Launch Project</a>
+          </div>
+
+          <!-- Code Mockup -->
+          <div class="code-editor-mockup">
+            <div class="editor-titlebar">
+              <div class="editor-dots">
+                <span class="editor-dot dot-red"></span>
+                <span class="editor-dot dot-yellow"></span>
+                <span class="editor-dot dot-green"></span>
+              </div>
+              <div class="editor-title">ak-prime-studio.js</div>
+            </div>
+            <div class="editor-body-grid">
+              <div class="editor-line-numbers">
+                <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div>
+              </div>
+              <div class="editor-code-container"><code><span class="code-keyword">const</span> studio = <span class="code-keyword">new</span> <span class="code-class">PrimeWebStudio</span>({
+  location: <span class="code-string">"Kandaghat, H.P."</span>,
+  stack: [<span class="code-string">"React"</span>, <span class="code-string">"Node"</span>, <span class="code-string">"CSS"</span>],
+  responsive: <span class="code-keyword">true</span>,
+  deliverySpeed: <span class="code-string">"Optimal"</span>
+});
+
+studio.initiateProject(<span class="code-string">"AK Prime V2"</span>);
+<span class="code-comment">// Systems engineered to scale</span><span class="editor-cursor">|</span></code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Client Reviews Section -->
+    <section id="reviews" class="reviews-section">
+      <div class="section-wrap">
+        <div class="reveal-v2 section-header-v2">
+          <span class="section-num">03 / TRUST</span>
+          <h2 class="font-display section-title-v2">Client Ecosystem</h2>
+          <p class="section-desc-v2">What our clients observe regarding our strategic coordination.</p>
+        </div>
+        
+        <div class="reviews-grid-v2">
+          <div class="reveal-v2 review-card-v2">
+            <div>
+              <div class="review-stars-v2">★★★★★</div>
+              <p class="review-text-v2">
+                "Very good support and website quality. The work was organized and professional. Highly recommend Prime Web Studio for anyone looking for a premium online presence."
+              </p>
+            </div>
+            <div class="client-block-v2">
+              <div class="client-avatar-v2">RS</div>
+              <div>
+                <div class="client-name-v2">Rohan Sharma</div>
+                <div class="client-loc-v2">Delhi</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="reveal-v2 review-card-v2">
+            <div>
+              <div class="review-stars-v2">★★★★★</div>
+              <p class="review-text-v2">
+                "Grow More Capital gave useful market understanding and guidance. Their insights helped me make informed investment decisions with confidence. Truly valuable service."
+              </p>
+            </div>
+            <div class="client-block-v2">
+              <div class="client-avatar-v2">KV</div>
+              <div>
+                <div class="client-name-v2">Kartik Verma</div>
+                <div class="client-loc-v2">Mumbai</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="reveal-v2 review-card-v2">
+            <div>
+              <div class="review-stars-v2">★★★★★</div>
+              <p class="review-text-v2">
+                "Professional work and fast response. Very satisfied with the outcome. The team at AK Prime Holdings is dedicated and delivers exactly what they promise."
+              </p>
+            </div>
+            <div class="client-block-v2">
+              <div class="client-avatar-v2">LT</div>
+              <div>
+                <div class="client-name-v2">Lakshay Thakur</div>
+                <div class="client-loc-v2">Chandigarh</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Goldman Sachs Briefings box -->
+        <div class="reveal-v2 briefings-wrap-v2">
+          <div>
+            <div class="briefings-title-v2">AK Prime Briefings</div>
+            <p class="briefings-desc-v2">Subscribe to receive professional macroeconomic summaries and layout system updates directly from Solan, Himachal Pradesh.</p>
+          </div>
+          <div>
+            <form class="briefings-form-v2" onsubmit="handleSubSubmit(event)">
+              <input type="email" id="sub-email" class="form-input-v2" placeholder="Your email address" required />
+              <button class="btn btn-primary" type="submit" style="white-space:nowrap;">Subscribe</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Contact Section -->
+    <section id="contact" class="contact-section-v2">
+      <div class="section-wrap">
+        <div class="reveal-v2 section-header-v2">
+          <span class="section-num">04 / CORE</span>
+          <h2 class="font-display section-title-v2">Start a Conversation</h2>
+          <p class="section-desc-v2">Submit your goals through our interactive briefing console or connect with our desks directly.</p>
+        </div>
+        
+        <div class="reveal-v2 contact-split-v2">
+          <!-- Left side: direct channel links & availability -->
+          <div>
+            <div class="badge-availability" style="margin-bottom: 2rem;">
+              <span class="dot-pulse"></span>
+              <span>Desks Operational 24×7</span>
+            </div>
+            
+            <h3 class="font-display" style="font-size: 1.4rem; margin-bottom: 1.25rem; color: #fff;">Direct Operations</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 2.2rem; font-size: 0.92rem; line-height: 1.7;">
+              Skip the configurator console and reach our regional coordinators directly. Expected response delay under 15 minutes.
+            </p>
+            
+            <div>
+              <a href="tel:7834070272" class="channel-row-v2">
+                <div class="channel-icon-v2">📞</div>
+                <div>
+                  <div class="channel-lbl-v2">Hotline Desk</div>
+                  <div class="channel-val-v2">783-4070-272</div>
+                </div>
+              </a>
+              
+              <a href="mailto:growmorecapital1992@gmail.com" class="channel-row-v2">
+                <div class="channel-icon-v2">📈</div>
+                <div>
+                  <div class="channel-lbl-v2">Advisory Inquiries</div>
+                  <div class="channel-val-v2">growmorecapital1992@gmail.com</div>
+                </div>
+              </a>
+              
+              <a href="mailto:akprimeholdings.limited@gmail.com" class="channel-row-v2">
+                <div class="channel-icon-v2">💻</div>
+                <div>
+                  <div class="channel-lbl-v2">Studio Inquiries</div>
+                  <div class="channel-val-v2">akprimeholdings.limited@gmail.com</div>
+                </div>
+              </a>
+            </div>
+
+            <!-- Regional headquarters info card with live clock (IST) -->
+            <div class="location-marker-card-v2">
+              <div class="location-info-wrapper">
+                <div style="font-size: 1.25rem;">📍</div>
+                <div>
+                  <div class="location-title-v2">Solan Headquarters</div>
+                  <div class="location-body-v2">Kandaghat, Solan, Himachal Pradesh, India</div>
+                </div>
+              </div>
+              <div id="live-ist-clock" style="font-family: var(--font-display); font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-top: 10px; padding-left: 2.25rem; display: flex; align-items: center; gap: 6px;">
+                <span class="dot-pulse" style="width:6px;height:6px;background:var(--accent);box-shadow:0 0 6px var(--accent);"></span>
+                <span id="clock-time">IST: Calculating...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right side: premium interactive inquiry form -->
+          <div class="contact-form-panel-v2">
+            <div class="form-selector-tabs-v2">
+              <button class="selector-tab-v2 active" id="form-tab-capital" type="button" onclick="setFormDivision('Strategic Capital')">📈 Capital Advisory</button>
+              <button class="selector-tab-v2" id="form-tab-studio" type="button" onclick="setFormDivision('Prime Web Studio')">💻 Web Studio</button>
+            </div>
+            
+            <form id="direct-inquiry-form" onsubmit="handleDirectInquirySubmit(event)">
+              <input type="hidden" id="direct-inquiry-division" value="Strategic Capital" />
+              
+              <div class="form-group-v2">
+                <label class="form-label-v2" for="direct-name">Name</label>
+                <input type="text" id="direct-name" class="form-input-v2" required placeholder="Your full name" />
+              </div>
+              
+              <div class="form-group-v2">
+                <label class="form-label-v2" for="direct-email">Email Address</label>
+                <input type="email" id="direct-email" class="form-input-v2" required placeholder="name@domain.com" />
+              </div>
+              
+              <div class="form-group-v2">
+                <label class="form-label-v2" for="direct-msg">Brief Requirements / Strategy Goals</label>
+                <textarea id="direct-msg" class="form-input-v2" required placeholder="Describe your financial goals or project targets..."></textarea>
+              </div>
+              
+              <button class="btn btn-primary" type="submit" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
+                <span>Submit Strategic Brief</span>
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 10 10">
+                  <path d="M1 5h7M5 2l3 3-3 3"></path>
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid-v2">
+      <div>
+        <div class="footer-brand-title">AK Prime Holdings</div>
+        <p class="footer-brand-desc">Coordinating capital advisories and responsive application engineering from Solan, India.</p>
+      </div>
+      
+      <div>
+        <div class="footer-column-title">Divisions</div>
+        <div class="footer-column-links">
+          <button class="footer-action-btn" onclick="scrollToSection('grow-more-capital')">Advisory Capital</button>
+          <button class="footer-action-btn" onclick="scrollToSection('prime-web-studio')">Engineering Studio</button>
         </div>
       </div>
       
-      <div class="redirect-banner">
-        <i class="fa-solid fa-circle-notch fa-spin"></i>
-        <span>Auto-redirecting to React Rebuild (V2) in <strong id="countdown">10</strong> seconds...</span>
+      <div>
+        <div class="footer-column-title">Company</div>
+        <div class="footer-column-links">
+          <button class="footer-action-btn" onclick="scrollToSection('reviews')">Ecosystem Trust</button>
+          <button class="footer-action-btn" onclick="scrollToSection('contact')">Connect Now</button>
+        </div>
       </div>
-
-      <div class="footer-credit">
-        Made by <a href="https://github.com/Ironmask7870" target="_blank" rel="noopener noreferrer">Ironmask7870</a>
+      
+      <div>
+        <div class="footer-column-title">Secure Desks</div>
+        <div class="footer-column-links">
+          <a href="tel:7834070272" class="footer-meta-link">Call 783-4070-272</a>
+          <a href="mailto:akprimeholdings.limited@gmail.com" class="footer-meta-link">akprimeholdings.limited@gmail.com</a>
+        </div>
       </div>
     </div>
+    
+    <div class="footer-bottom-v2">
+      <div class="copyright-lbl">© 2026 AK Prime Holdings. Systems operational.</div>
+      <div class="footer-region-badge">
+        <div class="region-badge-dot"></div>
+        <span class="region-badge-text">KANDAGHAT · SOLAN · HIMACHAL PRADESH</span>
+      </div>
+    </div>
+  </footer>
 
-    <script>
-      let seconds = 10;
-      const countdownEl = document.getElementById('countdown');
-      const interval = setInterval(() => {
-        seconds--;
-        countdownEl.textContent = seconds;
-        if (seconds <= 0) {
-          clearInterval(interval);
-          window.location.href = 'v2/';
+  <!-- Toast notifications -->
+  <div class="toast-v2" id="toast">
+    <span style="color:#10b981;font-weight:700;">✓</span>
+    <span id="toast-message">Operation successful!</span>
+  </div>
+
+  <script>
+    // Spotlight Mouse Tracker Init
+    const mouseGlow = document.createElement('div');
+    mouseGlow.id = 'mouse-glow';
+    document.body.appendChild(mouseGlow);
+
+    window.addEventListener('mousemove', (e) => {
+      mouseGlow.style.left = e.clientX + 'px';
+      mouseGlow.style.top = e.clientY + 'px';
+    });
+
+    // Scroll reveals
+    const reveals = document.querySelectorAll('.reveal-v2');
+    const navBar = document.getElementById('navbar-v2');
+
+    const checkScroll = () => {
+      const trigger = window.innerHeight * 0.88;
+      reveals.forEach(el => {
+        const top = el.getBoundingClientRect().top;
+        if (top < trigger) {
+          el.classList.add('active');
         }
-      }, 1000);
-    </script>
-  </body>
+      });
+      // Nav scroll class
+      if (window.scrollY > 30) {
+        navBar.classList.add('scrolled');
+      } else {
+        navBar.classList.remove('scrolled');
+      }
+    };
+    window.addEventListener('scroll', checkScroll);
+    window.addEventListener('load', checkScroll);
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.altKey) {
+        if (e.key === '1') {
+          e.preventDefault();
+          scrollToSection('grow-more-capital');
+        } else if (e.key === '2') {
+          e.preventDefault();
+          scrollToSection('prime-web-studio');
+        } else if (e.key === '3') {
+          e.preventDefault();
+          scrollToSection('reviews');
+        } else if (e.key === '4') {
+          e.preventDefault();
+          scrollToSection('contact');
+        }
+      }
+    });
+
+    // Mobile Hamburger Menu
+    const mobileToggle = document.getElementById('mobile-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileToggle.addEventListener('click', () => {
+      mobileToggle.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : 'auto';
+    });
+
+    mobileMenu.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileToggle.classList.remove('open');
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = 'auto';
+      });
+    });
+
+    // Morningstar Tab Switch
+    function switchTab(tabName) {
+      document.getElementById('pane-baro').classList.remove('active');
+      document.getElementById('pane-mover').classList.remove('active');
+      document.getElementById('tab-baro-btn').classList.remove('active');
+      document.getElementById('tab-mover-btn').classList.remove('active');
+
+      setTimeout(() => {
+        if (tabName === 'baro') {
+          document.getElementById('pane-baro').classList.add('active');
+          document.getElementById('tab-baro-btn').classList.add('active');
+        } else {
+          document.getElementById('pane-mover').classList.add('active');
+          document.getElementById('tab-mover-btn').classList.add('active');
+        }
+      }, 50);
+    }
+
+    // Direct Inquiry form toggling
+    function setFormDivision(divName) {
+      const isCapital = divName === 'Strategic Capital';
+      document.getElementById('direct-inquiry-division').value = divName;
+      
+      const tabCapital = document.getElementById('form-tab-capital');
+      const tabStudio = document.getElementById('form-tab-studio');
+      const btnSpan = document.querySelector('#direct-inquiry-form button span');
+
+      if (isCapital) {
+        tabCapital.classList.add('active');
+        tabStudio.classList.remove('active');
+        btnSpan.textContent = 'Submit Strategic Brief';
+      } else {
+        tabCapital.classList.remove('active');
+        tabStudio.classList.add('active');
+        btnSpan.textContent = 'Initiate Project Request';
+      }
+    }
+
+    // Form handlers
+    function handleDirectInquirySubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('direct-name').value;
+      const division = document.getElementById('direct-inquiry-division').value;
+      e.target.reset();
+      showToast(`Thank you, ${name}! Your brief for ${division} has been submitted successfully.`);
+    }
+
+    // Briefings newsletter sub
+    function handleSubSubmit(e) {
+      e.preventDefault();
+      document.getElementById('sub-email').value = '';
+      showToast('Subscription successful! Welcome to AK Prime Briefings.');
+    }
+
+    // Toast triggers
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+
+    // Scroll trigger helper
+    function scrollToSection(id) {
+      const section = document.getElementById(id);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Live clock ticking for Indian Standard Time (IST - Solan Desk location)
+    function tickISTClock() {
+      const timeContainer = document.getElementById('clock-time');
+      if (!timeContainer) return;
+      
+      const updateClock = () => {
+        const now = new Date();
+        const istTimeString = now.toLocaleTimeString('en-US', {
+          timeZone: 'Asia/Kolkata',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
+        timeContainer.textContent = `Solan Desk: ${istTimeString} (IST)`;
+      };
+      
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
+    window.addEventListener('DOMContentLoaded', tickISTClock);
+
+    // ScrollSpy active header state listener
+    const sections = document.querySelectorAll('main > section');
+    const navLinks = document.querySelectorAll('.nav-desktop .nav-link');
+
+    // Throttled Scroll Listener using requestAnimationFrame for 60fps buttery scrolling
+    let isScrolling = false;
+    window.addEventListener('scroll', () => {
+      if (!isScrolling) {
+        window.requestAnimationFrame(() => {
+          // 1. Update Scrollspy active navigation state
+          let current = '';
+          if (window.scrollY < 100) {
+            current = 'hero';
+          } else {
+            sections.forEach(section => {
+              const sectionTop = section.offsetTop;
+              if (window.scrollY >= (sectionTop - 220)) {
+                current = section.getAttribute('id');
+              }
+            });
+          }
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href').substring(1);
+            if (href === current) {
+              link.classList.add('active');
+            }
+          });
+
+          // 2. Update Scroll progress indicator line width
+          const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          const scrolled = (winScroll / height) * 100;
+          document.getElementById('scroll-progress').style.width = scrolled + '%';
+
+          // 3. Trigger reveal animation checks
+          checkScroll();
+
+          isScrolling = false;
+        });
+        isScrolling = true;
+      }
+    });
+
+    // REAL-TIME MOVERS DATA SIMULATION (Active prices & sparkline endpoints)
+    function simulateRealtimeMarketData() {
+      const moverStocks = {
+        rel: {
+          element: document.getElementById('percent-rel'),
+          row: document.getElementById('row-rel'),
+          path: document.getElementById('path-rel'),
+          fill: document.getElementById('fill-rel'),
+          basePath: "M0,22 Q15,8 30,16 T60,5 T90,2 L100,",
+          value: 2.45,
+          isUp: true
+        },
+        tcs: {
+          element: document.getElementById('percent-tcs'),
+          row: document.getElementById('row-tcs'),
+          path: document.getElementById('path-tcs'),
+          fill: document.getElementById('fill-tcs'),
+          basePath: "M0,5 Q20,20 40,12 T70,25 L100,",
+          value: -1.15,
+          isUp: false
+        },
+        hdfc: {
+          element: document.getElementById('percent-hdfc'),
+          row: document.getElementById('row-hdfc'),
+          path: document.getElementById('path-hdfc'),
+          fill: document.getElementById('fill-hdfc'),
+          basePath: "M0,20 Q20,8 40,18 T70,5 L100,",
+          value: 1.92,
+          isUp: true
+        }
+      };
+
+      setInterval(() => {
+        // Choose one random stock to update every 3 seconds
+        const keys = Object.keys(moverStocks);
+        const randomKey = keys[Math.floor(Math.random() * keys.length)];
+        const stock = moverStocks[randomKey];
+
+        // Slight price fluctuation (+/- 0.08%)
+        const delta = (Math.random() * 0.16 - 0.08);
+        const oldVal = stock.value;
+        stock.value = parseFloat((stock.value + delta).toFixed(2));
+
+        // Re-evaluate positive/negative sign
+        const prefix = stock.value > 0 ? "+" : "";
+        stock.element.textContent = `${prefix}${stock.value}%`;
+
+        // Calculate relatable Y coordinate directly based on current percentage value
+        let newEndY;
+        if (randomKey === 'rel') {
+          // Range: +1.0% (Y=20) to +3.5% (Y=2)
+          newEndY = 20 - ((stock.value - 1.0) / 2.5) * 18;
+        } else if (randomKey === 'tcs') {
+          // Range: -2.0% (Y=28) to -0.5% (Y=12)
+          newEndY = 12 + ((-0.5 - stock.value) / 1.5) * 16;
+        } else if (randomKey === 'hdfc') {
+          // Range: +0.5% (Y=20) to +3.0% (Y=2)
+          newEndY = 20 - ((stock.value - 0.5) / 2.5) * 18;
+        }
+        newEndY = Math.max(1, Math.min(29, Math.round(newEndY)));
+
+        // Update stroke path & fill area path in perfect sync
+        stock.path.setAttribute('d', `${stock.basePath}${newEndY}`);
+        if (stock.fill) {
+          stock.fill.setAttribute('d', `${stock.basePath}${newEndY} L100,30 L0,30 Z`);
+        }
+
+        // Visual tick flash highlights (green for up ticks, red for down ticks)
+        const isUpTick = stock.value >= oldVal;
+        const flashClass = isUpTick ? 'price-flash-up' : 'price-flash-down';
+        
+        stock.element.classList.remove('price-flash-up', 'price-flash-down');
+        // Force Reflow
+        void stock.element.offsetWidth;
+        stock.element.classList.add(flashClass);
+
+        // Adapt percent color dynamically if value changes sign
+        if (stock.value >= 0) {
+          stock.element.className = `mover-percent percent-up ${flashClass}`;
+        } else {
+          stock.element.className = `mover-percent percent-down ${flashClass}`;
+        }
+      }, 3000);
+    // REAL-TIME WEALTH ACCUMULATION TICKER
+    function startRealtimeWealthCounter() {
+      const wealthCounter = document.getElementById('hero-wealth-counter');
+      if (!wealthCounter) return;
+
+      let baseValue = 24015389.20;
+
+      // Update wealth accumulation ticking every 120ms
+      setInterval(() => {
+        // Increment by fractional amounts to show active wealth compounding
+        const increment = (Math.random() * 0.45 + 0.15); // ₹0.15 to ₹0.60
+        baseValue += increment;
+
+        // Format as Indian Rupee style currency: ₹2,40,15,389.20
+        wealthCounter.textContent = formatIndianRupee(baseValue);
+      }, 120);
+
+      function formatIndianRupee(number) {
+        const parts = number.toFixed(2).split('.');
+        let integerPart = parts[0];
+        const decimalPart = parts[1];
+
+        // Custom regex for Indian spacing rule (split hundreds then pairs of thousands)
+        let lastThree = integerPart.substring(integerPart.length - 3);
+        let otherNumbers = integerPart.substring(0, integerPart.length - 3);
+        if (otherNumbers !== '') {
+          lastThree = ',' + lastThree;
+        }
+        const formattedInteger = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        return '₹' + formattedInteger + '.' + decimalPart;
+      }
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      simulateRealtimeMarketData();
+      startRealtimeWealthCounter();
+    });
+  </script>
+</body>
 </html>
